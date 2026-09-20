@@ -61,7 +61,13 @@ export interface RSOReport {
   enviadoPor: string;
   idMilitar: string;
   viatura: string;
-  barca: { chefe: string; motorista: string; auxiliar: string };
+  barca: {
+    chefe: string;
+    motorista: string;
+    auxiliar: string;
+    anotador: string;
+    estagiario: string;
+  };
   ocorrencias: number;
   detidos: number;
   armamento: number;
@@ -80,6 +86,36 @@ export interface ActivePatrol {
   inicio: number;
   status: 'ativa' | 'encerrada';
 }
+
+export const CREW_ROLES = [
+  'chefe',
+  'motorista',
+  'auxiliar',
+  'anotador',
+  'estagiario',
+] as const;
+export type CrewRole = (typeof CREW_ROLES)[number];
+export const CREW_LABELS: Record<CrewRole, string> = {
+  chefe: 'Chefe de Barca',
+  motorista: 'Motorista',
+  auxiliar: 'Auxiliar',
+  anotador: 'Anotador',
+  estagiario: 'Estagiário',
+};
+export const MIN_CREW_TO_START = 3;
+
+export const VIATURAS = [
+  'ROTA 9100',
+  'ROTA 9101',
+  'ROTA 9102',
+  'ROTA 9103',
+  'ROTA 9104',
+  'ROTA 9105',
+  'ROTA 9106',
+  'ROTA 9107',
+  'ROTA 9108',
+  'ROTA 9109',
+] as const;
 
 export interface RankingEntry {
   id: string;

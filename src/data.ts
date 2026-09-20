@@ -43,8 +43,8 @@ export const mockRSOReports: RSOReport[] = [
     id: 'rso1',
     enviadoPor: 'Felipe Santos Araújo',
     idMilitar: 'ID 106',
-    viatura: 'Golf 4440',
-    barca: { chefe: 'ID 106', motorista: 'ID 110', auxiliar: 'ID 113' },
+    viatura: 'ROTA 9100',
+    barca: { chefe: 'ID 106', motorista: 'ID 110', auxiliar: 'ID 113', anotador: 'ID 114', estagiario: 'ID 115' },
     ocorrencias: 7,
     detidos: 3,
     armamento: 2,
@@ -59,8 +59,8 @@ export const mockRSOReports: RSOReport[] = [
     id: 'rso2',
     enviadoPor: 'Gabriel Martins Dias',
     idMilitar: 'ID 107',
-    viatura: 'Tango 2230',
-    barca: { chefe: 'ID 107', motorista: 'ID 109', auxiliar: 'ID 112' },
+    viatura: 'ROTA 9102',
+    barca: { chefe: 'ID 107', motorista: 'ID 109', auxiliar: 'ID 112', anotador: 'ID 113', estagiario: '' },
     ocorrencias: 4,
     detidos: 1,
     armamento: 1,
@@ -75,8 +75,8 @@ export const mockRSOReports: RSOReport[] = [
     id: 'rso3',
     enviadoPor: 'Igor Ramos Cardoso',
     idMilitar: 'ID 109',
-    viatura: 'Golf 4441',
-    barca: { chefe: 'ID 109', motorista: 'ID 111', auxiliar: 'ID 114' },
+    viatura: 'ROTA 9101',
+    barca: { chefe: 'ID 109', motorista: 'ID 111', auxiliar: 'ID 114', anotador: 'ID 115', estagiario: '' },
     ocorrencias: 9,
     detidos: 5,
     armamento: 3,
@@ -90,9 +90,9 @@ export const mockRSOReports: RSOReport[] = [
 ];
 
 export const mockActivePatrols: ActivePatrol[] = [
-  { id: 'p1', viatura: 'Golf 4440', operadores: ['ID 106', 'ID 110', 'ID 113'], inicio: Date.now() - 1000 * 60 * 47, status: 'ativa' },
-  { id: 'p2', viatura: 'Tango 2230', operadores: ['ID 107', 'ID 109', 'ID 112'], inicio: Date.now() - 1000 * 60 * 23, status: 'ativa' },
-  { id: 'p3', viatura: 'Alpha 9910', operadores: ['ID 104', 'ID 108'], inicio: Date.now() - 1000 * 60 * 92, status: 'ativa' },
+  { id: 'p1', viatura: 'ROTA 9100', operadores: ['ID 106', 'ID 110', 'ID 113', 'ID 114', 'ID 115'], inicio: Date.now() - 1000 * 60 * 47, status: 'ativa' },
+  { id: 'p2', viatura: 'ROTA 9102', operadores: ['ID 107', 'ID 109', 'ID 112', 'ID 113'], inicio: Date.now() - 1000 * 60 * 23, status: 'ativa' },
+  { id: 'p3', viatura: 'ROTA 9105', operadores: ['ID 104', 'ID 108', 'ID 111'], inicio: Date.now() - 1000 * 60 * 92, status: 'ativa' },
 ];
 
 export const mockRankingHoras: RankingEntry[] = [

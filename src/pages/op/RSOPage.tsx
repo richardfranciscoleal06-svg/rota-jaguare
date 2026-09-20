@@ -1,8 +1,11 @@
 import { useState } from 'react';
-import { mockMembers } from '@/data';
-import { FileText, Send, CheckCircle2, Plus, Minus, Car } from 'lucide-react';
-
-const viaturas = ['Golf 4440', 'Golf 4441', 'Tango 2230', 'Alpha 9910', 'Bravo 5520'];
+import { useStore } from '@/store';
+import {
+  VIATURAS, CREW_ROLES, CREW_LABELS, MIN_CREW_TO_START,
+} from '@/types';
+import {
+  FileText, Send, CheckCircle2, Plus, Minus, Car, AlertCircle,
+} from 'lucide-react';
 
 interface Counter {
   key: string;
@@ -11,8 +14,9 @@ interface Counter {
 }
 
 export default function RSOPage() {
-  const [viatura, setViatura] = useState(viaturas[0]);
-  const [barca, setBarca] = useState({ chefe: '', motorista: '', auxiliar: '' });
+  const { members, reports, setReports } = useStore();
+  const [viatura, setViatura] = useState<string>(VIATURAS[0]);
+  const [barca, setBarca] = useState<Record<string, string>>({});
   const [counters, setCounters] = useState<Counter[]>([
     { key: 'ocorrencias', label: 'Ocorrências', value: 0 },
     { key: 'detidos', label: 'Detidos', value: 0 },
@@ -24,6 +28,9 @@ export default function RSOPage() {
   ]);
   const [resumo, setResumo] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  const filledCrew = CREW_ROLES.filter((r) => barca[r]?.trim());
 
   const adjust = (key: string, delta: number) => {
     setCounters((prev) =>
@@ -35,9 +42,41 @@ export default function RSOPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (filledCrew.length < MIN_CREW_TO_START) {
+      setError(`Mínimo de ${MIN_CREW_TO_START} operadores na barca para transmitir o RSO.`);
+      return;
+    }
+    setError('');
+    const now = new Date();
+    const dataEnvio = `${now.toLocaleDateString('pt-BR')} ${now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`;
+    setReports((prev) => [
+      ...prev,
+      {
+        id: `rso${Date.now()}`,
+        enviadoPor: members.find((m) => m.idJogo === barca.chefe)?.nome ?? 'Operador',
+        idMilitar: barca.chefe ?? '',
+        viatura,
+        barca: {
+          chefe: barca.chefe ?? '',
+          motorista: barca.motorista ?? '',
+          auxiliar: barca.auxiliar ?? '',
+          anotador: barca.anotador ?? '',
+          estagiario: barca.estagiario ?? '',
+        },
+        ocorrencias: counters[0].value,
+        detidos: counters[1].value,
+        armamento: counters[2].value,
+        drogas: counters[3].value,
+        municoes: counters[4].value,
+        bombas: counters[5].value,
+        dinheiroMarcado: counters[6].value,
+        resumo,
+        dataEnvio,
+      },
+    ]);
     setSubmitted(true);
     setCounters(counters.map((c) => ({ ...c, value: 0 })));
-    setBarca({ chefe: '', motorista: '', auxiliar: '' });
+    setBarca({});
     setResumo('');
     setTimeout(() => setSubmitted(false), 3000);
   };
@@ -64,58 +103,53 @@ export default function RSOPage() {
             onChange={(e) => setViatura(e.target.value)}
             className="rota-input w-full"
           >
-            {viaturas.map((v) => (
+            {VIATURAS.map((v) => (
               <option key={v} value={v}>{v}</option>
             ))}
           </select>
         </div>
 
         <div>
-          <p className="text-xs font-semibold text-rota-light mb-2 uppercase tracking-wide">
-            Composição da Barca
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-[10px] text-rota-muted mb-1 uppercase">Chefe de Barca</label>
-              <select
-                value={barca.chefe}
-                onChange={(e) => setBarca({ ...barca, chefe: e.target.value })}
-                className="rota-input w-full"
-              >
-                <option value="">Selecione...</option>
-                {mockMembers.map((m) => (
-                  <option key={m.id} value={m.idJogo}>{m.idJogo} — {m.nome}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-[10px] text-rota-muted mb-1 uppercase">Motorista</label>
-              <select
-                value={barca.motorista}
-                onChange={(e) => setBarca({ ...barca, motorista: e.target.value })}
-                className="rota-input w-full"
-              >
-                <option value="">Selecione...</option>
-                {mockMembers.map((m) => (
-                  <option key={m.id} value={m.idJogo}>{m.idJogo} — {m.nome}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-[10px] text-rota-muted mb-1 uppercase">Auxiliar</label>
-              <select
-                value={barca.auxiliar}
-                onChange={(e) => setBarca({ ...barca, auxiliar: e.target.value })}
-                className="rota-input w-full"
-              >
-                <option value="">Selecione...</option>
-                {mockMembers.map((m) => (
-                  <option key={m.id} value={m.idJogo}>{m.idJogo} — {m.nome}</option>
-                ))}
-              </select>
-            </div>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-semibold text-rota-light uppercase tracking-wide">
+              Composição da Barca
+            </p>
+            <span className={`text-xs font-semibold ${filledCrew.length >= MIN_CREW_TO_START ? 'text-rota-green-light' : 'text-rota-muted'}`}>
+              {filledCrew.length}/5 preenchidos · mínimo {MIN_CREW_TO_START}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {CREW_ROLES.map((role) => (
+              <div key={role}>
+                <label className="block text-[10px] text-rota-muted mb-1 uppercase">
+                  {CREW_LABELS[role]}
+                </label>
+                <select
+                  value={barca[role] ?? ''}
+                  onChange={(e) => setBarca({ ...barca, [role]: e.target.value })}
+                  className="rota-input w-full"
+                >
+                  <option value="">Selecione...</option>
+                  {members
+                    .filter((m) => m.status === 'ATIVO')
+                    .filter((m) => !Object.values(barca).includes(m.idJogo) || barca[role] === m.idJogo)
+                    .map((m) => (
+                      <option key={m.id} value={m.idJogo}>
+                        {m.idJogo} — {m.nome}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            ))}
           </div>
         </div>
+
+        {error && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-rota-red/10 border border-rota-red/30 text-xs text-rota-red-light">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            {error}
+          </div>
+        )}
 
         <div>
           <p className="text-xs font-semibold text-rota-light mb-2 uppercase tracking-wide">
@@ -162,7 +196,11 @@ export default function RSOPage() {
           />
         </div>
 
-        <button type="submit" className="rota-btn-green w-full">
+        <button
+          type="submit"
+          className="rota-btn-green w-full"
+          disabled={submitted}
+        >
           {submitted ? (
             <>
               <CheckCircle2 className="w-4 h-4" />

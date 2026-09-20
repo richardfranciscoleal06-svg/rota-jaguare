@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useStore } from '@/store';
+import { CREW_ROLES, CREW_LABELS } from '@/types';
 import {
   CheckCircle2, XCircle, FileText, Car, Users, Package, Pill,
   Crosshair, Bomb, DollarSign, Inbox,
@@ -118,13 +119,18 @@ export default function ValidacaoRSO() {
                 </div>
 
                 <div className="bg-rota-panel rounded-md p-3 mb-4">
-                  <p className="text-xs text-rota-muted uppercase tracking-wide mb-1">
+                  <p className="text-xs text-rota-muted uppercase tracking-wide mb-2">
                     Composição da Barca
                   </p>
-                  <div className="flex items-center gap-3 text-sm text-rota-light">
-                    <span>Chefe: <strong className="text-rota-white">{r.barca.chefe}</strong></span>
-                    <span>Motorista: <strong className="text-rota-white">{r.barca.motorista}</strong></span>
-                    <span>Auxiliar: <strong className="text-rota-white">{r.barca.auxiliar}</strong></span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-sm text-rota-light">
+                    {CREW_ROLES.map((role) => (
+                      <div key={role} className="flex items-center gap-1.5">
+                        <span className="text-rota-muted text-xs">{CREW_LABELS[role]}:</span>
+                        <strong className="text-rota-white">
+                          {r.barca[role] || '—'}
+                        </strong>
+                      </div>
+                    ))}
                   </div>
                 </div>
 

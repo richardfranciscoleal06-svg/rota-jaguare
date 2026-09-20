@@ -1,14 +1,27 @@
 import { useState } from 'react';
-import { mockRankingHoras, mockRankingApreensoes } from '@/data';
+import { useStore } from '@/store';
 import { Trophy, Clock, DollarSign, Medal } from 'lucide-react';
-import type { RankingEntry } from '@/types';
 
 const medalColors = ['text-rota-gold', 'text-rota-light', 'text-rota-red-light'];
 
 export default function RankingsPage() {
+  const { members } = useStore();
   const [tab, setTab] = useState<'horas' | 'apreensoes'>('horas');
-  const data: RankingEntry[] =
-    tab === 'horas' ? mockRankingHoras : mockRankingApreensoes;
+
+  const data = [...members]
+    .filter((m) => m.status === 'ATIVO')
+    .sort((a, b) =>
+      tab === 'horas'
+        ? b.horasPatrulha - a.horasPatrulha
+        : b.apreensoesRs - a.apreensoesRs
+    )
+    .slice(0, 10)
+    .map((m) => ({
+      id: m.id,
+      nome: m.nome,
+      patente: m.patente,
+      valor: tab === 'horas' ? m.horasPatrulha : m.apreensoesRs,
+    }));
 
   return (
     <div className="animate-fade-in">
